@@ -8,6 +8,10 @@ public class Invite {
 	private Table table;
 	
 	
+	public Invite() {
+		groupe = new Groupe();
+		table = new Table();
+	}
 	public Groupe getGroupe() {
 		return groupe;
 	}

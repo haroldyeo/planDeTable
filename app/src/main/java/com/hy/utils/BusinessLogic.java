@@ -8,7 +8,9 @@ import com.hy.pojos.Table;
 
 public class BusinessLogic {
 	
-	public void create(String entity, Object obj){
+	Dao dao = new Dao();
+	
+	public void create(String entity, Object obj) throws Exception{
 		
 		String INSERT_QUERY = null;
 		
@@ -33,9 +35,10 @@ public class BusinessLogic {
 		}
 		
 		// Appel de la méthode d'exécution
+		dao.executeQuery(INSERT_QUERY);
 	}
 	
-	public void update(String entity, Object obj){
+	public void update(String entity, Object obj) throws Exception{
 		
 		String UPDATE_QUERY = null;
 		
@@ -61,12 +64,14 @@ public class BusinessLogic {
 		}
 		
 		// Appel de la méthode d'exécution
+		dao.executeQuery(UPDATE_QUERY);
 	}
 	
-	public void delete(String nomTable, int id){
+	public void delete(String nomTable, int id) throws Exception{
 		
 		final String DELETE_QUERY = "delete from " +nomTable+" where id = "+id;
 		// Appel de la méthode d'exécution
+		dao.executeQuery(DELETE_QUERY);
 	}
 	
 	
@@ -75,13 +80,17 @@ public class BusinessLogic {
 	 * Obtenir la liste de tous les invités
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public List<Invite> getAllInvites(){
 		
-		final String GET_ALL_INVITES = "select inv.nom as invite, grp.nom_groupe, tbl.num_table, tbl.nom_table "
-									+ " from t_invites inv "
-									+ " left join t_groupe grp on inv.groupe_id = grp.id " 
+		final String GET_ALL_INVITES = "select inv.id as invite_id, inv.nom as nom_invite," 
+									+ " grp.id as groupe_id, grp.nom_groupe," 
+									+ " tbl.num_table, tbl.nom_table "
+									+ " from t_invites inv"
+									+ " left join t_groupe grp on inv.groupe_id = grp.id" 
 									+ " left join t_table tbl on inv.table_num = tbl.num_table";
 				
-		return null;
+		
+		return (List<Invite>) dao.executeSelect(GET_ALL_INVITES, "all_invites");
 	}
 }

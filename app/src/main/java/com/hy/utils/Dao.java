@@ -6,6 +6,11 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.hy.pojos.Invite;
 
 /**
  *
@@ -15,6 +20,7 @@ public class Dao {
 	
 	Connection con = null;
     PreparedStatement pst = null;
+    Statement statement = null;
 	
 	public static final String DB_DRIVER = "org.sqlite.JDBC";
 	public static final String DB_CONNECTION = "jdbc:sqlite:C:/2017/planDeTable/pdtDB.sqlite";
@@ -37,12 +43,14 @@ public class Dao {
 	}
 	
 	
-	public void executeQuery(String query){
+	public void  executeQuery(String query) throws Exception{
 		try {
             con = getConnection();
-            pst = con.prepareStatement(query);
+            statement = con.createStatement();
          // execute statement
-    		ResultSet rs = pst.executeQuery();
+    		System.out.println("executing query: "+ query);
+    		statement.executeUpdate(query);
+    		
             
         } catch (Exception e) {
 			e.getMessage();
@@ -57,6 +65,50 @@ public class Dao {
 	}
 
 }
+	
+	public Object executeSelect(String query, String keyword){
+		try {
+			con = getConnection();
+			pst = con.prepareStatement(query);
+			
+			ResultSet rs = pst.executeQuery(query);
+			switch (keyword) {
+			case "all_invites":
+				return doHandleAllInvites(rs);
+
+			default:
+				break;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
+
+
+	private List<Invite> doHandleAllInvites(ResultSet rs) {
+		try {
+				List<Invite> listInvites = new ArrayList<>();
+				
+				while(rs.next()){
+					Invite inv = new Invite();
+					inv.setId(rs.getInt("invite_id"));
+					inv.setNomInvite(rs.getString("nom_invite"));
+					inv.getGroupe().setId(rs.getInt("groupe_id"));
+					inv.getGroupe().setNomGroupe("nom_groupe");
+					inv.getTable().setNumeroTable(rs.getInt("num_table"));
+					inv.getTable().setNomTable(rs.getString("nom_table"));	
+					
+					listInvites.add(inv);
+				}
+				return listInvites;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new ArrayList<>();
+	}
 	
 	
 }
